@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# shamelessy stolen from https://github.com/skeeto/w64devkit/issues/50#issuecomment-1445488484
+
+export PATH_SEPARATOR=';'
+export ac_executable_extensions='.exe'
+export build_alias="$CHOST"
+
+if [ -f configure ]
+then
+    echo "Converting configure..."
+    sed -i 's/func_convert_file_msys_to_w32/func_convert_file_noop/' configure
+fi

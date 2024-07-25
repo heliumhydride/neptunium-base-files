@@ -1,0 +1,28 @@
+#!/bin/bash
+[ -z "$tgt" ] && tgt="x86_64-w64-mingw32"
+
+error(){
+        echo >&2 -e "\e[1;31m=> $1\e[0m"
+}
+
+warn(){
+        echo -e "\e[1;33m=> $1\e[0m"
+}
+
+[ "$*" = "" ] && { error "No Windows executable specified!"; exit 1; }
+
+for i in "$@"; do
+	[ -e "$i" ] || { error "File $i not found!"; exit 1; }
+done
+
+if [ "$#" -gt 1 ]; then
+	for i in "$@"; do
+		"${tgt}-objdump" -x "$i" | grep "DLL Name" | cut -f3- -d' ' | awk '{ print "'"$i"'" ": " $0 }'
+		_excode="$?"
+	done
+else
+	"${tgt}-objdump" -x "$i" | grep "DLL Name" | cut -f3- -d' '
+	_excode="$?"
+fi
+
+[ "$_excode" != 0 ] && warn "${tgt}-objdump returned exit code $_excode"
